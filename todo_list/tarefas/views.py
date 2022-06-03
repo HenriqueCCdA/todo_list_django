@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.urls import reverse
 
 from todo_list.tarefas.forms import TarefaNovaForm
+from todo_list.tarefas.models import Tarefa
 
 
 def home(request):
@@ -12,6 +13,12 @@ def home(request):
             form.save()
             return HttpResponseRedirect(reverse('tarefas:home'))
         else:
-            return render(request, 'tarefas/home.html', {'form': form}, status=400)
+            tarefas_pendentes = Tarefa.objects.filter(feita=False).all()
+            context = {'form': form,
+                       'tarefas_pendentes': tarefas_pendentes
+                       }
+            return render(request, 'tarefas/home.html', context=context, status=400)
 
-    return render(request, 'tarefas/home.html')
+    tarefas_pendentes = Tarefa.objects.filter(feita=False).all()
+    context = {'tarefas_pendentes': tarefas_pendentes}
+    return render(request, 'tarefas/home.html', context=context)
